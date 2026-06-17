@@ -1,8 +1,10 @@
 #![allow(unused_variables)]
 #![allow(dead_code)]
-#[allow(unused_imports)]
+#![allow(unused_imports)]
 
 use std::env;
+use std::fs;
+use std::io;
 use colored::*;
 use clap::Parser;
 
@@ -11,7 +13,7 @@ use clap::Parser;
 #[command(version, about, long_about = None)]
 struct Args {
     /// expression to search for
-    #[arg(short, long)]
+    #[arg(short='e', long)]
     expression: String,
 
     /// lines that match the expression
@@ -27,7 +29,7 @@ struct Args {
     recursive: bool,
 
     /// file/directory to search
-    #[arg(short, long)]
+    #[arg(short='f', long)]
     file: String,
 }
 
@@ -55,6 +57,19 @@ fn pluck_inverse(expression: &str, file: &str) {
     }
 }
 
+fn display_matches(file: &str, args: &Args, expression: &str) {
+    let mut file = get_file(file);
+    if args.case_insensitive {
+        file = file.to_lowercase();
+    }
+
+    if args.invert_match {
+        pluck_inverse(expression, &file);
+    } else {
+        pluck(expression, &file);
+    }
+}
+
 fn main() {
     let args = Args::parse();
 
@@ -65,15 +80,15 @@ fn main() {
     };
 
     if args.recursive {
-        println!("Recursive search is not implemented yet.");
+        let dir_path = &args.file;
+        for entry in fs::read_dir(dir_path).unwrap() {
+            let path = entry.unwrap().path();
+            println!("in: {}", path.display());
+            if path.is_file() {
+                display_matches(&path.display().to_string(), &args, expression);
+            }
+        }   
     } else {
-    
-        let file = get_file(&args.file);
-
-        if args.invert_match {
-            pluck_inverse(expression, &file);
-        } else {
-            pluck(expression, &file);
-        }
+        display_matches(&args.file, &args, expression);
     }
 }
