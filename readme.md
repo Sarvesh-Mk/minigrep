@@ -11,6 +11,11 @@ do minigrep --help or minigrep -h for details!
 
 **NOTE**: if recursive is set, file must be a path to a directory
 
+## Releases
+Head over to [releases](https://github.com/Sarvesh-Mk/minigrep/releases). Currently there is only a linux distribution 
+
+You can also build it for source code! Clone the repository and run: **Cargo build --release**  
+
 ## Future Implementations
 **piping** functionality, I might do this in the future (when I figure out what '|' acctually does!)
 
